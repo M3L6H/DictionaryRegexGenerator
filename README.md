@@ -27,3 +27,9 @@ Run the command `python main.py "./dictionary.txt"` in the directory containing 
 ```
 (?:e(?:lephant|m(?:phasis|erge)|ntrance)|South(?:ern)|s(?:he(?:lls)|ells)|California)
 ```
+
+## Flags
+
+Using the `-i` or `--insensitive` flag will convert any upper case words to lower case. Note that it does not automatically add the insensitive flag to the regular expression.
+
+Using the `-w` or `--whole` flag will generate a regular expression that only matches to whole words.

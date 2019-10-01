@@ -1,4 +1,6 @@
-import sys
+import re, sys
+
+WORD = re.compile(r"[A-Za-z']+\n?")
 
 class Tree:
     def __init__(self, key = "_root", children = {}):
@@ -55,19 +57,19 @@ class Tree:
 def getDiff(a, b):
     return [i for i in range(min(len(a) + 1, len(b) + 1)) if len(a) == i or len(b) == i or a[i] != b[i]][0]
 
-def insertAbbrev(tree, abbrev):
+def insertWord(tree, word, depth = 0):
     # Look for a matching key
     for key in tree.getChildren():
-        diff = getDiff(key, abbrev)
+        diff = getDiff(key, word)
 
         # We found a similar prefix
         if diff != 0:
             # How similar are we
-            match, rest = abbrev[:diff], abbrev[diff:]
+            match, rest = word[:diff], word[diff:]
 
             # Does the prefix we are looking for already exist?
             if tree.getChild(match):
-                return insertAbbrev(tree.getChild(match), rest)
+                return insertWord(tree.getChild(match), rest, depth + 1)
 
             # Otherwise we need to update the tree
             tree.setChild(match, tree.getChild(key))
@@ -75,9 +77,6 @@ def insertAbbrev(tree, abbrev):
 
             # Now we work with the subtree
             tree = tree.getChild(match)
-
-            # Insert our abbreviation as a sibling
-            tree.addChild(rest)
 
             # Make a deep copy so we can edit the base
             children = tree.getChildren().copy()
@@ -89,20 +88,54 @@ def insertAbbrev(tree, abbrev):
             # Add that as a new subtree
             tree.setKey(match)
             tree.setChild(tree_rest, Tree(tree_rest, children))
+
+            # Insert our abbreviation as a sibling
+            tree.addChild(rest)
             return
     # If there are no matching keys, add a new child to this level of the tree
-    tree.addChild(abbrev)
+    if depth > 0:
+        tree.addChild("")
+    tree.addChild(word)
 
 def main(args):
-    words = [line.rstrip('\n') for line in open(args[1]) if line != "\n"]
+    insensitive = False
+    wholeword = False
+
+    while "-i" in args:
+        insensitive = True
+        args.remove("-i")
+
+    while "--insensitive" in args:
+        insensitive = True
+        args.remove("--insensitive")
+
+    while "-w" in args:
+        wholeword = True
+        args.remove("-w")
+
+    while "--whole" in args:
+        wholeword = True
+        args.remove("--whole")
+
+    words = [line.rstrip('\n') for line in open(args[1]) if WORD.match(line)]
+
+    if insensitive:
+        words = [word.lower() for word in words]
+
+    words.sort()
 
     tree = Tree()
 
     for word in words:
-        insertAbbrev(tree, word)
+        insertWord(tree, word)
+
+    regex = tree.getRegex().replace("||", "|")
+
+    if wholeword:
+        regex = f"(?<!\w){ regex }(?!\w)"
 
     with open("out.txt", "w") as f:
-        f.write(tree.getRegex())
+        f.write(regex)
 
 
 if __name__ == "__main__":
