@@ -25,7 +25,7 @@ California
 Run the command `python main.py "./dictionary.txt"` in the directory containing this script. You will find the output in "out.txt". With the above input, it would look something like this:
 
 ```Regular Expression
-/(?:California|South(?:|ern)|e(?:lephant|m(?:erge|phasis)|ntrance)|s(?:ells|he(?:|lls)))/
+(?:California|South(?:|ern)|e(?:lephant|m(?:erge|phasis)|ntrance)|s(?:ells|he(?:|lls)))
 ```
 
 ## Flags
