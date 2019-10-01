@@ -76,6 +76,9 @@ def insertAbbrev(tree, abbrev):
             # Now we work with the subtree
             tree = tree.getChild(match)
 
+            # Insert our abbreviation as a sibling
+            tree.addChild(rest)
+
             # Make a deep copy so we can edit the base
             children = tree.getChildren().copy()
             tree.clearChildren()
@@ -86,9 +89,6 @@ def insertAbbrev(tree, abbrev):
             # Add that as a new subtree
             tree.setKey(match)
             tree.setChild(tree_rest, Tree(tree_rest, children))
-
-            # Insert our abbreviation as a sibling
-            tree.addChild(rest)
             return
     # If there are no matching keys, add a new child to this level of the tree
     tree.addChild(abbrev)
